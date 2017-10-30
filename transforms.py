@@ -80,3 +80,4 @@ def gradient(img, s_thresh=(170, 255), sx_thresh=(20, 100)):
     combined_binary = np.zeros_like(sxbinary)
     combined_binary[(s_binary == 1) | (sxbinary == 1)] = 1
     return combined_binary
+
