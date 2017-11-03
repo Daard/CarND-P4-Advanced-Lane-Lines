@@ -54,6 +54,8 @@ def perspective_tr(img, src, dst, img_size):
     inv_m = cv2.getPerspectiveTransform(dst, src)
     return tr_img, t_m, inv_m
 
+# TODO : https://github.com/js1972/CarND-Advanced-Lane-Lines/blob/master/Advanced%20Lane%20Line%20Finding%20Workbook.ipynb
+
 def gradient(img, s_thresh=(170, 255), sx_thresh=(20, 100)):
     img = np.copy(img)
     # Convert to HLS color space and separate the V channel
@@ -147,10 +149,11 @@ def lane_lines(binary_warped, visualise=False):
         win_xright_low = rightx_current - margin
         win_xright_high = rightx_current + margin
         # Draw the windows on the visualization image
-        cv2.rectangle(out_img, (win_xleft_low, win_y_low), (win_xleft_high, win_y_high),
-                      (0, 255, 0), 2)
-        cv2.rectangle(out_img, (win_xright_low, win_y_low), (win_xright_high, win_y_high),
-                      (0, 255, 0), 2)
+        if visualise:
+            cv2.rectangle(out_img, (win_xleft_low, win_y_low), (win_xleft_high, win_y_high),
+                          (0, 255, 0), 2)
+            cv2.rectangle(out_img, (win_xright_low, win_y_low), (win_xright_high, win_y_high),
+                          (0, 255, 0), 2)
         # Identify the nonzero pixels in x and y within the window
         good_left_inds = ((nonzeroy >= win_y_low) & (nonzeroy < win_y_high) &
                           (nonzerox >= win_xleft_low) & (nonzerox < win_xleft_high)).nonzero()[0]
@@ -191,6 +194,38 @@ def lane_lines(binary_warped, visualise=False):
     else:
         return left_fitx, right_fitx, ploty, left_fit, right_fit
 
+def lane_lines2(binary_warped, left_fit, right_fit):
+    # Assume you now have a new warped binary image
+    # from the next frame of video (also called "binary_warped")
+    # It's now much easier to find line pixels!
+    nonzero = binary_warped.nonzero()
+    nonzeroy = np.array(nonzero[0])
+    nonzerox = np.array(nonzero[1])
+    margin = 100
+    left_lane_inds = ((nonzerox > (left_fit[0] * (nonzeroy ** 2) + left_fit[1] * nonzeroy +
+                                   left_fit[2] - margin)) & (nonzerox < (left_fit[0] * (nonzeroy ** 2) +
+                                                                         left_fit[1] * nonzeroy + left_fit[
+                                                                             2] + margin)))
+
+    right_lane_inds = ((nonzerox > (right_fit[0] * (nonzeroy ** 2) + right_fit[1] * nonzeroy +
+                                    right_fit[2] - margin)) & (nonzerox < (right_fit[0] * (nonzeroy ** 2) +
+                                                                           right_fit[1] * nonzeroy + right_fit[
+                                                                               2] + margin)))
+
+    # Again, extract left and right line pixel positions
+    leftx = nonzerox[left_lane_inds]
+    lefty = nonzeroy[left_lane_inds]
+    rightx = nonzerox[right_lane_inds]
+    righty = nonzeroy[right_lane_inds]
+    # Fit a second order polynomial to each
+    left_fit = np.polyfit(lefty, leftx, 2)
+    right_fit = np.polyfit(righty, rightx, 2)
+    # Generate x and y values for plotting
+    ploty = np.linspace(0, binary_warped.shape[0] - 1, binary_warped.shape[0])
+    left_fitx = left_fit[0] * ploty ** 2 + left_fit[1] * ploty + left_fit[2]
+    right_fitx = right_fit[0] * ploty ** 2 + right_fit[1] * ploty + right_fit[2]
+    return left_fitx, right_fitx, ploty, left_fit, right_fit
+
 
 def draw(warped, undist, Minv, left_fitx, right_fitx, ploty):
     # Create an image to draw the lines on
@@ -212,4 +247,20 @@ def draw(warped, undist, Minv, left_fitx, right_fitx, ploty):
 
     #TODO: add left_r, right_r, deviation
 
+    return result
+
+
+def pipeline(img):
+    obj_points, img_points = read_points()
+    undist = cal_undistort(img, obj_points, img_points)
+    corners = np.float32([[253, 697], [585, 456], [700, 456], [1061, 690]])
+    new_top_left = np.array([corners[0, 0], 0])
+    new_top_right = np.array([corners[3, 0], 0])
+    offset = [50, 0]
+    src = np.float32([corners[0], corners[1], corners[2], corners[3]])
+    dst = np.float32([corners[0] + offset, new_top_left + offset, new_top_right - offset, corners[3] - offset])
+    tr_img, t_m, inv_m = perspective_tr(undist, src, dst, (undist.shape[1], undist.shape[0]))
+    binary_warped = gradient(tr_img)
+    left_fitx, right_fitx, ploty, left_fit, right_fit = lane_lines(binary_warped, visualise=False)
+    result = draw(binary_warped, img, inv_m, left_fitx, right_fitx, ploty)
     return result
