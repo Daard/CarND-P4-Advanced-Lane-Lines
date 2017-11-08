@@ -2,11 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="358e9302-df75-4843-96c2-f882ff95f359" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/line.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/output_images/project_video_challenge_output.mp4" afterPath="$PROJECT_DIR$/output_images/project_video_challenge_output.mp4" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.ipynb_checkpoints/notebook-checkpoint.ipynb" afterPath="$PROJECT_DIR$/.ipynb_checkpoints/notebook-checkpoint.ipynb" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/notebook.ipynb" afterPath="$PROJECT_DIR$/notebook.ipynb" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/transforms.py" afterPath="$PROJECT_DIR$/transforms.py" />
     </list>
     <ignored path="CarND-P4-Advanced-Lane-Lines.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -25,22 +24,15 @@
     <favorites_list name="CarND-P4-Advanced-Lane-Lines" />
   </component>
   <component name="FileEditorManager">
-    <leaf>
-      <file leaf-file-name="notebook.ipynb" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/notebook.ipynb">
-          <provider selected="true" editor-type-id="ipnb-editor">
-            <state>
-              <selected id="1" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="transforms.py" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/transforms.py">
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file leaf-file-name="line.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/line.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="181">
-              <caret line="225" column="0" lean-forward="true" selection-start-line="225" selection-start-column="0" selection-end-line="225" selection-end-column="0" />
-              <folding />
+            <state relative-caret-position="519">
+              <caret line="154" column="26" lean-forward="false" selection-start-line="154" selection-start-column="26" selection-end-line="154" selection-end-column="26" />
+              <folding>
+                <element signature="e#0#10#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -66,11 +58,12 @@
         <option value="$PROJECT_DIR$/calibration.py" />
         <option value="$PROJECT_DIR$/notebook.ipynb" />
         <option value="$PROJECT_DIR$/transforms.py" />
+        <option value="$PROJECT_DIR$/line.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="342" />
+    <option name="x" value="290" />
     <option name="y" value="23" />
     <option name="width" value="1482" />
     <option name="height" value="962" />
@@ -100,20 +93,6 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="CarND-P4-Advanced-Lane-Lines" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="CarND-P4-Advanced-Lane-Lines" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="CarND-P4-Advanced-Lane-Lines" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="test_images" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -277,7 +256,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="342" y="23" width="1482" height="962" extended-state="0" />
+    <frame x="290" y="23" width="1482" height="962" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.22334683" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
@@ -316,6 +295,21 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/notebook.ipynb">
+      <provider selected="true" editor-type-id="ipnb-editor">
+        <state>
+          <selected id="-1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/transforms.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3375">
+          <caret line="225" column="0" lean-forward="true" selection-start-line="225" selection-start-column="0" selection-end-line="225" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/notebook.ipynb">
       <provider selected="true" editor-type-id="ipnb-editor">
         <state>
@@ -551,6 +545,14 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/transform.py" />
     <entry file="file://$PROJECT_DIR$/calibration.ipynb" />
+    <entry file="file://$PROJECT_DIR$/transforms.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3375">
+          <caret line="225" column="0" lean-forward="true" selection-start-line="225" selection-start-column="0" selection-end-line="225" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/notebook.ipynb">
       <provider selected="true" editor-type-id="ipnb-editor">
         <state>
@@ -558,11 +560,13 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/transforms.py">
+    <entry file="file://$PROJECT_DIR$/line.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="181">
-          <caret line="225" column="0" lean-forward="true" selection-start-line="225" selection-start-column="0" selection-end-line="225" selection-end-column="0" />
-          <folding />
+        <state relative-caret-position="519">
+          <caret line="154" column="26" lean-forward="false" selection-start-line="154" selection-start-column="26" selection-end-line="154" selection-end-column="26" />
+          <folding>
+            <element signature="e#0#10#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
