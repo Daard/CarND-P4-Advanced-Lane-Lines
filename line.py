@@ -41,8 +41,11 @@ class Line():
         # fit histovry over last n img
         self.history_fit = []
 
-        # Last angle
-        self.angle = None
+        # Last top angle
+        self.top_angle = None
+
+        # Last bottom angle
+        self.bottom_angle = None
 
         # Last curvature rad
         self.curve_rad = None
@@ -50,6 +53,11 @@ class Line():
         # Best fit
         self.best_fit = None
 
+        # X pixel position
+        self.x = None
+
+        # Y pixel position
+        self.y = None
 
 
     def lane_line_from_fit(self, binary_warped, fit):
@@ -65,10 +73,10 @@ class Line():
                                                                    fit[1] * nonzeroy + fit[
                                                                        2] + margin)))
         # Again, extract left and right line pixel positions
-        leftx = nonzerox[lane_inds]
-        lefty = nonzeroy[lane_inds]
+        self.x = nonzerox[lane_inds]
+        self.y = nonzeroy[lane_inds]
         # Fit a second order polynomial to each
-        return np.polyfit(lefty, leftx, 2)
+        return np.polyfit(self.y, self.x, 2)
 
     def lane_line(self, binary_warped):
         # Assuming you have created a warped binary image called "binary_warped"
@@ -120,11 +128,11 @@ class Line():
         lane_inds = np.concatenate(lane_inds)
 
         # Extract left and right line pixel positions
-        x = nonzerox[lane_inds]
-        y = nonzeroy[lane_inds]
+        self.x = nonzerox[lane_inds]
+        self.y = nonzeroy[lane_inds]
 
         # Fit a second order polynomial to each
-        return np.polyfit(y, x, 2)
+        return np.polyfit(self.y, self.x, 2)
 
     def fit_lane(self, warped, fit):
         # Generate x and y values for plotting
@@ -157,10 +165,12 @@ class Line():
         scene_height = image_size[0] * ym_per_pix
         scene_width = image_size[1] * xm_per_pix
 
-        # Calculate angle of
-        angle = m.atan(2 * left_fit_cr[0] * scene_height + left_fit_cr[1]) * 180 / m.pi
+        # Calculate top angle
+        top_angle = m.atan(2 * left_fit_cr[0] * scene_height + left_fit_cr[1]) * 180 / m.pi
+        # Calculate bottom angle
+        bottom_angle = m.atan(left_fit_cr[1]) * 180 / m.pi
 
-        return curve_rad, angle
+        return curve_rad, top_angle, bottom_angle
 
     def calculate(self, binary_warped):
         if (not self.detected):
@@ -173,14 +183,21 @@ class Line():
         # Get line pixels for drawing
         fitx, ploty = self.fit_lane(binary_warped, fit)
         # get geometry
-        curve_rad, angle = self.geometry(fitx, ploty, binary_warped)
+        curve_rad, top_angle, bottom_angle = self.geometry(fitx, ploty, binary_warped)
+
+        def check(a1, a2):
+            return m.fabs(a1 - a2) < 0.5
 
         # Sanity check, lines must be parallel
-        if self.angle is not None & m.fabs(self.angle - angle) < 0.5:
+        if self.bottom_angle is not None \
+                & self.top_angle is not None \
+                & check(self.bottom_angle, bottom_angle) \
+                & check(self.top_angle, top_angle):
             self.current_fit = fit
         else:
             self.detected = False
-        self.angle = angle
+        self.top_angle = top_angle
+        self.bottom_angle = bottom_angle
         self.curve_rad = curve_rad
         # If history queue has max length, pop first entered(last seen image)
         if (len(self.history_fit) == 5):
@@ -189,27 +206,53 @@ class Line():
         self.best_fit = np.mean(self.history_fit, axis=0)
 
 
+def deviation(leftx, lefty, rightx, righty, binary_warped):
+    image_size = binary_warped.shape
+    ploty = np.linspace(0, binary_warped.shape[0] - 1, binary_warped.shape[0])
+
+    y_eval = np.max(ploty)
+    # Define conversions in x and y from pixels space to meters
+    ym_per_pix = 30 / 720  # meters per pixel in y dimension
+    xm_per_pix = 3.7 / 700  # meters per pixel in x dimension
+
+    # Fit new polynomials to x,y in world space
+    left_fit_cr = np.polyfit(lefty * ym_per_pix, leftx * xm_per_pix, 2)
+    right_fit_cr = np.polyfit(righty * ym_per_pix, rightx * xm_per_pix, 2)
+
+    # Now our radius of curvature is in meters
+    # Example values: 632.1 m    626.2 m
+
+    # Calculate Lane Deviation from center of lane:
+    # First we calculate the intercept points at the bottom of our image, then use those to
+    # calculate the lane deviation of the vehicle (assuming camera is in center of vehicle)
+    scene_height = image_size[0] * ym_per_pix
+    scene_width = image_size[1] * xm_per_pix
+
+    left_intercept = left_fit_cr[0] * scene_height ** 2 + left_fit_cr[1] * scene_height + left_fit_cr[2]
+    right_intercept = right_fit_cr[0] * scene_height ** 2 + right_fit_cr[1] * scene_height + right_fit_cr[2]
+    calculated_center = (left_intercept + right_intercept) / 2.0
+
+    lane_deviation = (calculated_center - scene_width / 2.0)
+
+    return lane_deviation
+
+
 def draw2(warped, undist, Minv, left, right):
     # Draw lanes on scene
     left_fitx, right_fitx, ploty = fit_lanes(warped, left.best_fit, right.best_fit)
-
     # Create an image to draw the lines on
     warp_zero = np.zeros_like(warped).astype(np.uint8)
     color_warp = np.dstack((warp_zero, warp_zero, warp_zero))
-
     # Recast the x and y points into usable format for cv2.fillPoly()
     pts_left = np.array([np.transpose(np.vstack([left_fitx, ploty]))])
     pts_right = np.array([np.flipud(np.transpose(np.vstack([right_fitx, ploty])))])
     pts = np.hstack((pts_left, pts_right))
-
     # Draw the lane onto the warped blank image
     cv2.fillPoly(color_warp, np.int_([pts]), (0, 255, 0))
-
     # Warp the blank back to original image space using inverse perspective matrix (Minv)
     newwarp = cv2.warpPerspective(color_warp, Minv, (undist.shape[1], undist.shape[0]))
     # Combine the result with the original image
     result = cv2.addWeighted(undist, 1, newwarp, 0.3, 0)
-
     curvature_text = "Curvature: Left = " + str(np.round(left.curve_rad, 2)) + ", Right = " + str(np.round(right.curve_rad, 2))
     font = cv2.FONT_HERSHEY_COMPLEX
     cv2.putText(result, curvature_text, (30, 60), font, 1, (0, 255, 0), 2)
@@ -219,6 +262,7 @@ def draw2(warped, undist, Minv, left, right):
     angle_text = "Angle: Left = " + str(np.round(left.angle, 2)) + ", Right = " + str(np.round(right.angle, 2))
     cv2.putText(result, angle_text, (30, 120), font, 1, (0, 255, 0), 2)
     return result
+
 
 def pipeline2(img):
     global left_line
